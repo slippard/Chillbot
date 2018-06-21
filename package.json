@@ -22,6 +22,7 @@
   "homepage": "https://github.com/slippard/Chillbot#readme",
   "dependencies": {
     "discord.js": "^11.3.2",
+    "moment": "^2.22.2",
     "mongoose": "^5.1.4"
   }
 }

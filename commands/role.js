@@ -1,7 +1,7 @@
 module.exports.run = async (bot, message, args) => {
 
-    let newRole = message.content.substr("+role ".length);
     let guildMember = message.member;
+    let newRole = message.content.substr("+role ".length);    
     let devRole = message.guild.roles.find("name", "Devs");
     let realmRole = message.guild.roles.find("name", "RotMG");
     let nsfw = message.guild.roles.find("name", "NSFW");

@@ -1,10 +1,11 @@
 const Discord = require("discord.js");
 const bot = new Discord.Client();
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://koubi:pir0g03th@ds153980.mlab.com:53980/chillbot');
+mongoose.connect('mongodb://koubi:PH7cyvyB@ds153980.mlab.com:53980/chillbot');
 const User = require('./models/user');
 const fs = require('fs');
 const config = require('./config.json');
+var global = require("./global.js");
 const db = mongoose.connection;
 bot.commands = new Discord.Collection();
 
@@ -34,71 +35,49 @@ fs.readdir('./commands/', (err, files) => {
 bot.on('message', message => {
     let prefix = config.prefix;
     let msg = message.content.toLowerCase();
+    let guildMember = message.member;
     let cont = message.content.slice(prefix.length).split(" ");
     let args = cont.slice(1);
+    let a = message.author;
     let cmd = bot.commands.get(cont[0]);
     if (cmd) cmd.run(bot, message, args);
-    if (bot.user.id === message.author.id) {
-        return
-    };
-    if (!msg.startsWith(prefix)) {
-        User.count({
-            username: message.author.username
-        }, function (err, count) {
-            if (err) {
-                console.log(err)
-            } else if (count == 0) {
-                let user = new User();
-                user.username = message.author.username;
-                user.userId = message.author.id;
-                user.messageCount = 0;
-                user.money = 0;
-                user.save(function (err) {
-                    if (err) {
-                        console.log(err)
-                    } else {
-                        console.log(message.author.username + ' added to the database.');
-                    }
-                })
-            } else {
-                User.update({
-                    $inc: {
-                        money: 1
-                    }
-                }).exec();
-                User.update({
-                    $inc: {
-                        messageCount: 1
-                    }
-                }).exec();
-                console.log('incremented money and message count');
-            }
-        });
+    if (bot.user.id === message.author.id) { return };
+    updateUsers()
+    global.checkPlayer(a);
+
+    if (message.content == prefix + 'log') {
+        message.channel.send(global.log());
     }
+
+    if (message.content == prefix + 'update') {
+        if (guildMember.roles.some(r => ["Admins", "Mods"].includes(r.name))) {
+            message.channel.send('Updating Users.');
+            updateUsers();
+        } else {
+            message.channel.send('You do not have permission to do that.');
+        }
+    }
+    
 });
 
 function updateUsers() {
-    let guild = bot.guilds.get("241455314669535234");
-    setTimeout(() => {
-        let userlist = '';
-        guild.members.array().forEach(member => {
-            userlist++
-        });
-        bot.user.setPresence({ game: { name: `${userlist} members chillin`, type: 0 } });
-    }, 1000);
+    bot.user.setActivity(bot.users.size + ' members chillin 😎', {"type": "playing"});
 }
 
 bot.on('guildMemberAdd', member => {
-    member.guild.channels.get(config.joinleave).send('**' + member.user.username + '**, has joined the server');
+    let guild = bot.guilds.get("241455314669535234");
+    guild.channels.get(config.joinleave).send('**' + member.user.username + '**, has joined ' + member.guild.name);
     updateUsers()
 });
 
 bot.on('guildMemberRemove', member => {
-    member.guild.channels.get(config.joinleave).send('**' + member.user.username + '**, has left the server');
+    let guild = bot.guilds.get("241455314669535234");
+    guild.channels.get(config.joinleave).send('**' + member.user.username + '**, has left ' + member.guild.name);
     updateUsers()
 });
 
 bot.on('ready', () => {
+    updateUsers()
     console.log('Chillbot ready...');
     bot.user.setStatus('available')
     bot.user.setPresence({

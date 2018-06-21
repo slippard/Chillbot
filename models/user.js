@@ -16,6 +16,10 @@ let userSchema = mongoose.Schema({
     money: {
         type: Number,
         required: true
+    },
+    collected: {
+        type: String,
+        required: true
     }
 });
 
