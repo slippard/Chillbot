@@ -8,6 +8,8 @@ const config = require('./config.json');
 var global = require("./global.js");
 const db = mongoose.connection;
 bot.commands = new Discord.Collection();
+var Roll = require('roll'),
+    roll = new Roll();
 
 db.on('error', function (err) {
     console.log('Something went wrong: ' + err);
@@ -42,6 +44,7 @@ bot.on('message', message => {
     let cmd = bot.commands.get(cont[0]);
     if (cmd) cmd.run(bot, message, args);
     if (bot.user.id === message.author.id) { return };
+    if (!message.content.startsWith(prefix)) return;
     updateUsers()
     global.checkPlayer(a);
 

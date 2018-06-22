@@ -23,6 +23,7 @@
   "dependencies": {
     "discord.js": "^11.3.2",
     "moment": "^2.22.2",
-    "mongoose": "^5.1.4"
+    "mongoose": "^5.1.4",
+    "roll": "^1.2.0"
   }
 }
